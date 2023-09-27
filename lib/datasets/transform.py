@@ -251,7 +251,7 @@ class ToTensor(object):
                 sample['mask'] = torch.from_numpy(mask.astype(np.float32))
         return sample
 
-
+# 独热编码
 def onehot(label, num):
     m = label
     one_hot = np.eye(num)[m]
