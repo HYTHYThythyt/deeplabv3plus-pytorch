@@ -24,6 +24,7 @@ def train_net():
                             num_workers=cfg.DATA_WORKERS,
                             drop_last=True)
 
+    # TODO 2023/09/28 10:16
     net = generate_net(cfg)
     if cfg.TRAIN_TBLOG:
         from tensorboardX import SummaryWriter
@@ -101,14 +102,14 @@ def train_net():
 
             if itr % 5000 == 0:
                 save_path = os.path.join(cfg.MODEL_SAVE_DIR, '%s_%s_%s_itr%d.pth' % (
-                cfg.MODEL_NAME, cfg.MODEL_BACKBONE, cfg.DATA_NAME, itr))
+                    cfg.MODEL_NAME, cfg.MODEL_BACKBONE, cfg.DATA_NAME, itr))
                 torch.save(net.state_dict(), save_path)
                 print('%s has been saved' % save_path)
 
             itr += 1
 
     save_path = os.path.join(cfg.MODEL_SAVE_DIR, '%s_%s_%s_epoch%d_all.pth' % (
-    cfg.MODEL_NAME, cfg.MODEL_BACKBONE, cfg.DATA_NAME, cfg.TRAIN_EPOCHS))
+        cfg.MODEL_NAME, cfg.MODEL_BACKBONE, cfg.DATA_NAME, cfg.TRAIN_EPOCHS))
     torch.save(net.state_dict(), save_path)
     if cfg.TRAIN_TBLOG:
         tblogger.close()

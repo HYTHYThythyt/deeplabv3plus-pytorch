@@ -64,7 +64,7 @@ class Centerlize(object):
         assert isinstance(output_size, (int, tuple))
         self.output_size = output_size
         self.seg_interpolation = cv2.INTER_CUBIC if is_continuous else cv2.INTER_NEAREST
-    # TODO NOW
+
     def __call__(self, sample):
         image = sample['image']
         h, w = image.shape[:2]
@@ -82,6 +82,7 @@ class Centerlize(object):
         bottom = new_h - h - top
         left = (new_w - w) // 2
         right = new_w - w - left
+        # cv2.BORDER_CONSTANT 边框具有恒定的颜色 value(0,0,0)图片是RGB颜色
         img = cv2.copyMakeBorder(image, top, bottom, left, right, cv2.BORDER_CONSTANT, value=[0, 0, 0])
         if 'segmentation' in sample.keys():
             segmentation = sample['segmentation']
@@ -244,12 +245,14 @@ class ToTensor(object):
                 segmentation = sample['segmentation']
                 sample['segmentation'] = torch.from_numpy(segmentation.astype(np.float32))
             elif 'segmentation_onehot' == key:
+                # TODO 此处不理解
                 onehot = sample['segmentation_onehot'].transpose((2, 0, 1))
                 sample['segmentation_onehot'] = torch.from_numpy(onehot.astype(np.float32))
             elif 'mask' == key:
                 mask = sample['mask']
                 sample['mask'] = torch.from_numpy(mask.astype(np.float32))
         return sample
+
 
 # 独热编码
 def onehot(label, num):

@@ -19,6 +19,8 @@ def conv3x3(in_planes, out_planes, stride=1, atrous=1):
                      padding=1 * atrous, dilation=atrous, bias=False)
 
 
+# 两个 3*3 卷积 SBN ReLU
+# 捷径不需要调整通道数
 class BasicBlock(nn.Module):
     expansion = 1
 
@@ -53,6 +55,8 @@ class BasicBlock(nn.Module):
         return out
 
 
+# 一个 3*3 两个 1*1 捷径相加 SBN ReLU
+# 捷径不需要调整通道数
 class Bottleneck(nn.Module):
     expansion = 4
 
@@ -115,7 +119,9 @@ class ResNet_Atrous(nn.Module):
         #                          nn.Conv2d(64,64,kernel_size=3, stride=1, padding=1),
         #                          nn.Conv2d(64,64,kernel_size=3, stride=1, padding=1),
         #                      )
+        # SynchronizedBatchNorm2d 使得在多 GPU 中同步 running_mean 和 running_var
         self.bn1 = SynchronizedBatchNorm2d(64, momentum=bn_mom)
+        # inplace=True 原地操作
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         self.layer1 = self._make_layer(block, 64, 64, layers[0])
@@ -162,10 +168,12 @@ class ResNet_Atrous(nn.Module):
 
     def forward(self, x):
         self.layers = []
+        # 7*7
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
         x = self.maxpool(x)
+
         x = self.layer1(x)
         self.layers.append(x)
         x = self.layer2(x)
@@ -173,6 +181,7 @@ class ResNet_Atrous(nn.Module):
         x = self.layer3(x)
         self.layers.append(x)
         x = self.layer4(x)
+        # 下面是原始的 cascaded model
         # x = self.layer5(x)
         # x = self.layer6(x)
         # x = self.layer7(x)

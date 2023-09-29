@@ -146,6 +146,7 @@ class VOCDataset(Dataset):
             sample = self.multiscale(sample)
 
         if 'segmentation' in sample.keys():
+            # 得到 boolean 掩码
             sample['mask'] = sample['segmentation'] < self.cfg.MODEL_NUM_CLASSES
             t = sample['segmentation']
             t[t >= self.cfg.MODEL_NUM_CLASSES] = 0

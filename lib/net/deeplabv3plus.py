@@ -16,6 +16,7 @@ class deeplabv3plus(nn.Module):
         self.backbone = None
         self.backbone_layers = None
         input_channel = 2048
+        # TODO 2023/09/28 10:20
         self.aspp = ASPP(dim_in=input_channel,
                          dim_out=cfg.MODEL_ASPP_OUTDIM,
                          rate=16 // cfg.MODEL_OUTPUT_STRIDE,
@@ -47,8 +48,10 @@ class deeplabv3plus(nn.Module):
             if isinstance(m, nn.Conv2d):
                 nn.init.kaiming_normal_(m.weight, mode='fan_out', nonlinearity='relu')
             elif isinstance(m, SynchronizedBatchNorm2d):
+                # gamma beta
                 nn.init.constant_(m.weight, 1)
                 nn.init.constant_(m.bias, 0)
+        # TODO 2023/09/28 10:30
         self.backbone = build_backbone(cfg.MODEL_BACKBONE, os=cfg.MODEL_OUTPUT_STRIDE)
         self.backbone_layers = self.backbone.get_layers()
 
